@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Un Universo Contigo - Saturno Lleno</title>
+    <title>Un Universo Contigo - Saturno Máximo</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         body, html {
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
             background-color: #02010a;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             cursor: pointer;
@@ -21,69 +21,79 @@
         #canvas-container {
             width: 100%;
             height: 100%;
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             z-index: 1;
         }
         .instrucciones {
-            position: absolute;
+            position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
             z-index: 10;
             pointer-events: none;
             font-size: 0.9rem;
             text-shadow: 0 0 6px rgba(0,0,0,0.9);
             text-align: center;
-            background: rgba(15, 10, 30, 0.6);
+            background: rgba(15, 10, 30, 0.65);
             padding: 10px 20px;
             border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
             backdrop-filter: blur(4px);
         }
+        /* Forzamos un alto mínimo pequeño para permitir un leve scroll interactivo si se desea */
+        .scroller-helper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 102vh;
+            pointer-events: none;
+            z-index: 0;
+        }
     </style>
-    <!-- Cargamos Three.js y OrbitControls -->
+    <!-- Cargamos las librerías necesarias de Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
     <div class="instrucciones">
-        🎵 HAZ CLIC EN CUALQUIER PARTE para reproducir la música • Usa el mouse para hacer Zoom
+        🎵 HAZ CLIC o MUEVE LA PÁGINA para activar la música • Usa el mouse para hacer Zoom
     </div>
+    
+    <div class="scroller-helper"></div>
     <div id="canvas-container"></div>
 
-    <!-- AUDIO TRADICIONAL CON CROSSORIGIN ANONYMOUS PARA EVITAR BLOQUEOS DE NAVEGADOR -->
-    <audio id="musica-universo" loop crossorigin="anonymous">
-        <!-- Enlace de música por defecto (Garantizado que funciona y no se bloquea) -->
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
-    </audio>
-
     <script>
-        // --- CONTROL DE AUDIO SEGURO ---
-        const audio = document.getElementById('musica-universo');
-        let audioIniciado = false;
-
-        // Intentar cambiar el origen a tu Drive si lo deseas. 
-        // NOTA: Para Drive usa este formato: https://docs.google.com/uc?export=download&id=TU_ID_DE_DRIVE
-        // RESPALDO: Si usas otra URL externa, el atributo crossorigin="anonymous" de arriba evitará que se silencie.
+        // --- SISTEMA DE AUDIO (Basado exactamente en tu referencia) ---
+        const audioPlayer = new Audio();
         
-        function activarAudio() {
-            if (!audioIniciado) {
-                audio.play().then(() => {
-                    audioIniciado = true;
-                    console.log("Audio iniciado con éxito.");
-                }).catch(error => {
-                    console.log("Esperando una interacción válida del usuario...", error);
-                });
-            }
-        }
+        // Enlace de música por defecto de alta estabilidad.
+        // Si usas Google Drive recuerda usar este formato: https://docs.google.com/uc?export=download&id=TU_ID_DE_DRIVE
+        audioPlayer.src = 'https://bcodestorague.anteroteobaldob.workers.dev/share/anteroteobaldob_gmail_com/AUDIO/Buenos%20dias.mp3';
+        audioPlayer.loop = true;
+        audioPlayer.volume = 0.5;
+        
+        let musicStarted = false;
 
-        // Activadores globales al hacer clic o tocar la pantalla
-        window.addEventListener('click', activarAudio);
-        window.addEventListener('touchstart', activarAudio);
+        const startMusic = () => {
+            if (!musicStarted) {
+                audioPlayer.play().then(() => {
+                    musicStarted = true;
+                    console.log("Música iniciada correctamente mediante el método de referencia.");
+                }).catch(e => console.log("Interacción requerida para el audio:", e));
+            }
+        };
+
+        // Disparador por clic en cualquier parte de la pantalla
+        window.addEventListener('click', startMusic);
+        window.addEventListener('touchstart', startMusic);
+
+        // Disparador por movimiento/scroll (Idéntico a tu plantilla de flores amarillas)
+        window.addEventListener('scroll', startMusic);
 
 
         // --- CONFIGURACIÓN ESCENA 3D ---
@@ -91,7 +101,7 @@
         const scene = new THREE.Scene();
         
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 15, 35); // Vista inicial panorámica y lejana de Saturno
+        camera.position.set(0, 16, 36); // Posición predeterminada Lejos panorámica
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -101,54 +111,54 @@
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
-        controls.maxDistance = 60; 
+        controls.maxDistance = 65; 
         controls.minDistance = 9;  
 
         // --- ILUMINACIÓN CÓSMICA ---
-        const ambientLight = new THREE.AmbientLight(0x554466); // Luz ambiental morada/azulada
+        const ambientLight = new THREE.AmbientLight(0x5a4a75); 
         scene.add(ambientLight);
 
-        const directionalLight = new THREE.DirectionalLight(0xfff5ea, 1.5); // Luz estelar cálida
-        directionalLight.position.set(12, 8, 10);
+        const directionalLight = new THREE.DirectionalLight(0xfff3e0, 1.6); 
+        directionalLight.position.set(15, 10, 12);
         scene.add(directionalLight);
 
-        // --- CREACIÓN DE SATURNO ---
+        // --- CREACIÓN DE SATURNO (Eje Central) ---
         const saturnGroup = new THREE.Group(); 
 
-        // Cuerpo del Planeta
+        // Esfera del Planeta
         const planetGeometry = new THREE.SphereGeometry(4.5, 64, 64);
         const saturnCanvas = document.createElement('canvas');
         saturnCanvas.width = 512;
         saturnCanvas.height = 256;
         const ctx = saturnCanvas.getContext('2d');
         let grad = ctx.createLinearGradient(0, 0, 0, 256);
-        grad.addColorStop(0, '#2b160a');
-        grad.addColorStop(0.2, '#94663d');
-        grad.addColorStop(0.4, '#d9b473');
-        grad.addColorStop(0.5, '#b08450');
-        grad.addColorStop(0.6, '#d9b473');
-        grad.addColorStop(0.8, '#94663d');
-        grad.addColorStop(1, '#2b160a');
+        grad.addColorStop(0, '#261308');
+        grad.addColorStop(0.2, '#8c5e38');
+        grad.addColorStop(0.4, '#d1ab6e');
+        grad.addColorStop(0.5, '#a67b49');
+        grad.addColorStop(0.6, '#d1ab6e');
+        grad.addColorStop(0.8, '#8c5e38');
+        grad.addColorStop(1, '#261308');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 512, 256);
         
         const planetTexture = new THREE.CanvasTexture(saturnCanvas);
-        const planetMaterial = new THREE.MeshPhongMaterial({ map: planetTexture, shininess: 15 });
+        const planetMaterial = new THREE.MeshPhongMaterial({ map: planetTexture, shininess: 18 });
         const planet = new THREE.Mesh(planetGeometry, planetMaterial);
         saturnGroup.add(planet);
 
         // Anillos en 3D
-        const ringGeometry = new THREE.RingGeometry(6.2, 11.5, 64);
+        const ringGeometry = new THREE.RingGeometry(6.3, 12.0, 64);
         const ringCanvas = document.createElement('canvas');
         ringCanvas.width = 256;
         ringCanvas.height = 1;
         const ringCtx = ringCanvas.getContext('2d');
         let ringGrad = ringCtx.createLinearGradient(0, 0, 256, 0);
-        ringGrad.addColorStop(0, 'rgba(148, 102, 61, 0.8)');
-        ringGrad.addColorStop(0.2, 'rgba(217, 180, 115, 0.6)');
+        ringGrad.addColorStop(0, 'rgba(140, 94, 56, 0.85)');
+        ringGrad.addColorStop(0.25, 'rgba(209, 171, 110, 0.6)');
         ringGrad.addColorStop(0.4, 'rgba(0, 0, 0, 0)'); // División de Cassini
-        ringGrad.addColorStop(0.6, 'rgba(176, 132, 80, 0.7)');
-        ringGrad.addColorStop(1, 'rgba(43, 22, 10, 0)');
+        ringGrad.addColorStop(0.55, 'rgba(166, 123, 73, 0.75)');
+        ringGrad.addColorStop(1, 'rgba(38, 19, 8, 0)');
         ringCtx.fillStyle = ringGrad;
         ringCtx.fillRect(0, 0, 256, 1);
 
@@ -157,40 +167,42 @@
             map: ringTexture, 
             side: THREE.DoubleSide, 
             transparent: true,
-            opacity: 0.85
+            opacity: 0.9
         });
         
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
         ring.rotation.x = Math.PI / 2; 
         saturnGroup.add(ring);
 
-        saturnGroup.rotation.z = 0.35; // Inclinación del planeta
+        saturnGroup.rotation.z = 0.38; // Ángulo realista de inclinación
         scene.add(saturnGroup);
 
-        // --- ENTORNO: 3000 ESTRELLAS ---
+
+        // --- CAMPO ESTRELLADO DENSO (4000 estrellas) ---
         const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 3000;
+        const starsCount = 4000;
         const starPositions = new Float32Array(starsCount * 3);
         for (let i = 0; i < starsCount * 3; i++) {
-            starPositions[i] = (Math.random() - 0.5) * 300;
+            starPositions[i] = (Math.random() - 0.5) * 350;
         }
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.35 });
+        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.38 });
         const starField = new THREE.Points(starsGeometry, starsMaterial);
         scene.add(starField);
 
 
-        // --- NUBE MASIVA DE PALABRAS (34 Expresiones / Verbos) ---
+        // --- NUBE DE SENTIMIENTOS MÁXIMA (50 Expresiones) ---
         const sentimientos = [
-            "Amarte ❤️", "Cuidarte 🌹", "Besarte 💋", "Abrazarte 🫂",
-            "Escucharte 👂", "Adorarte ✨", "Valorarte 💎", "Protegerte 🛡️",
-            "Soñarte 💭", "Admirarte 😍", "Acompañarte 🤝", "Inspirarte 💡",
-            "Entenderte 🧠", "Extrañarte ⌛", "Apoyarte 🏋️", "Hacerte reír 😂",
-            "Pensarte 🤔", "Elegirte ✔️", "Valorarte 👑", "Sentirte 💓",
-            "Buscarte 🔍", "Aceptarte 🕊️", "Esperarte ⏰", "Descubrirte 🗺️",
-            "Recordarte 💾", "Fascinarte 🔮", "Consentirte 🧸", "Motivarte 🚀",
-            "Ilusionarte 🌠", "Sanarte 🩹", "Guiarte 🧭", "Comprenderte 🤝",
-            "Divertirte 🥳", "Respetarte ✊"
+            "Amarte ❤️", "Cuidarte 🌹", "Besarte 💋", "Abrazarte 🫂", "Escucharte 👂", 
+            "Adorarte ✨", "Valorarte 💎", "Protegerte 🛡️", "Soñarte 💭", "Admirarte 😍", 
+            "Acompañarte 🤝", "Inspirarte 💡", "Entenderte 🧠", "Extrañarte ⌛", "Apoyarte 🏋️", 
+            "Hacerte reír 😂", "Pensarte 🤔", "Elegirte ✔️", "Valorarte 👑", "Sentirte 💓", 
+            "Buscarte 🔍", "Aceptarte 🕊️", "Esperarte ⏰", "Descubrirte 🗺️", "Recordarte 💾", 
+            "Fascinarte 🔮", "Consentirte 🧸", "Motivarte 🚀", "Ilusionarte 🌠", "Sanarte 🩹", 
+            "Guiarte 🧭", "Comprenderte 🤝", "Divertirte 🥳", "Respetarte ✊", "Extrañarte 🌌",
+            "Abrazarte 🧸", "Anhelarte 💫", "Celebrarte 🎉", "Defenderte ⚔️", "Escribirte ✍️",
+            "Escucharte 🎵", "Alentarte 📣", "Iluminarte ☀️", "Agradecerte 🙏", "Cuidarte 🍃",
+            "Sentirte 💘", "Soñarte 🪐", "Amarte 💖", "Comprenderte ✨", "Elegirte 🌹"
         ];
 
         const textMeshes = [];
@@ -204,23 +216,23 @@
             context.font = 'Bold 36px "Segoe UI", sans-serif';
             context.fillStyle = '#ffffff';
             context.textAlign = 'center';
-            context.shadowColor = '#ffb473';
-            context.shadowBlur = 15; // Brillo de neón dorado/estelar
+            context.shadowColor = '#f0c27b';
+            context.shadowBlur = 14; // Brillo estelar
             context.fillText(text, 256, 70);
             
             return new THREE.CanvasTexture(canvas);
         }
 
-        // Distribución en múltiples capas/radios para que se vea lleno en profundidad
+        // Distribución en un diseño de 4 capas esféricas concéntricas alternadas
         sentimientos.forEach((texto, index) => {
             const textTexture = createTextTexture(texto);
             const spriteMaterial = new THREE.SpriteMaterial({ map: textTexture, transparent: true });
             const sprite = new THREE.Sprite(spriteMaterial);
             
-            sprite.scale.set(6.5, 1.6, 1); 
+            sprite.scale.set(6.8, 1.7, 1); 
 
-            // Variamos los radios para crear una nube densa tridimensional (unas cerca de los anillos, otras lejos)
-            const radioOrbita = 15 + (index % 3) * 4; // Distribuye entre distancias 15, 19 y 23
+            // Estratificación de radios (distancias 15, 18.5, 22, 25.5) para rellenar todo el vacío visual
+            const radioOrbita = 15 + (index % 4) * 3.5; 
 
             const phi = Math.acos(-1 + (2 * index) / sentimientos.length);
             const theta = Math.sqrt(sentimientos.length * Math.PI) * phi;
@@ -229,9 +241,9 @@
             sprite.position.y = radioOrbita * Math.sin(phi) * Math.sin(theta);
             sprite.position.z = radioOrbita * Math.cos(phi);
 
-            // Cada palabra tendrá una velocidad y dirección ligeramente distinta para dar dinamismo
+            // Dinámicas de órbita independientes
             sprite.userData = {
-                speedY: 0.001 + (index % 3) * 0.001,
+                speedY: 0.0008 + (index % 4) * 0.0006,
                 direction: (index % 2 === 0) ? 1 : -1
             };
 
@@ -240,16 +252,15 @@
         });
 
 
-        // --- BUCLE DE ANIMACIÓN RENDERING ---
+        // --- BUCLE DE ANIMACIÓN ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // Rotación suave de Saturno sobre su eje inclinado
-            saturnGroup.rotation.y += 0.0025;
+            // Rotación intrínseca de Saturno y sus anillos
+            saturnGroup.rotation.y += 0.002;
 
-            // Animación de la gran nube de palabras
+            // Rotación orbital cruzada de las palabras
             textMeshes.forEach((sprite) => {
-                // Rotan en direcciones alternas alrededor del eje Y para un efecto más caótico y lleno
                 sprite.position.applyAxisAngle(new THREE.Vector3(0, 1, 0), sprite.userData.speedY * sprite.userData.direction);
             });
 
@@ -257,7 +268,7 @@
             renderer.render(scene, camera);
         }
 
-        // Redimensionamiento de pantalla dinámico
+        // Manejo adaptativo del tamaño de pantalla
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
